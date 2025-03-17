@@ -1,38 +1,67 @@
 # Black Widow Optimization Algorithm
 
-A Python implementation of the Black Widow Optimization Algorithm, a meta-heuristic approach for solving optimization problems, inspired by the mating behavior of black widow spiders.
+Python implementation of the Black Widow Optimization Algorithm for solving optimization problems, inspired by black widow spider mating behavior.
 
 ## Overview
 
-The Black Widow Optimization Algorithm is a population-based meta-heuristic algorithm inspired by the unique mating behavior of black widow spiders, where sexual cannibalism occurs (females sometimes eat males after mating). This algorithm was introduced in the paper "Black Widow Optimization Algorithm: A novel meta-heuristic approach for solving engineering optimization problems" by Hayyolalam & Pourhaji Kazem (2020).
-
-Key features of this implementation:
-- Clean, object-oriented design
-- Efficient NumPy-based operations
-- Support for both minimization and maximization problems
-- Customizable parameters
-- Convergence tracking
-- Comprehensive benchmark functions
+The Black Widow Optimization Algorithm is a population-based meta-heuristic algorithm introduced by Hayyolalam & Pourhaji Kazem (2020). It's inspired by black widow spider mating behavior, including sexual cannibalism.
 
 ## Project Structure
 
-- `black_widow.py`: Main implementation of the algorithm
-- `benchmark_functions.py`: Collection of benchmark functions including those from the original paper
-- `example.py`: Example usage with benchmark functions from the original paper
-- `test.py`: Test script to verify the implementation
-- `README.md`: Documentation
+- `black_widow.py`: Algorithm implementation
+- `benchmark_functions.py`: Benchmark functions from the original paper
+- `example.py`: Example usage with benchmark functions
+- `test.py`: Test script
+- `frequency_regulation_function.py`: Power system frequency regulation functions
+- `optimize_frequency_regulation.py`: Application to power system frequency regulation
 
 ## Requirements
 
 - Python 3.6+
 - NumPy
-- Matplotlib (for visualization in examples)
+- Matplotlib
+
+## Power System Frequency Regulation Application
+
+This repository includes an application of the algorithm to optimize PID controller parameters for power system frequency regulation.
+
+### Application Overview
+
+The application optimizes PID controller parameters to improve frequency stability of a two-area power system after load disturbances.
+
+Components:
+- Two-area power system model (Area 1: PV system, Area 2: Thermal system with reheat)
+- PID controller optimization using ITAE criterion
+- System response visualization and performance metrics
+
+### Running the Optimization
+
+```bash
+python optimize_frequency_regulation.py
+```
+
+This will:
+1. Generate system responses if needed
+2. Run the optimization to find optimal PID parameters
+3. Compare system responses
+4. Generate plots and display metrics
+
+### Results
+
+The optimization improves power system frequency stability:
+- ITAE value reduced by ~76% compared to system without controller
+- Maximum frequency deviations reduced by ~75% in both areas
+- Maximum tie-line power deviation reduced by ~76%
+
+Output plots:
+- `pid_optimization_convergence.png`: Optimization convergence
+- `system_responses_comparison.png`: System response comparison
 
 ## Benchmark Functions
 
-This implementation includes the benchmark functions used in the original paper:
+Benchmark functions from the original paper:
 
-1. **F1: Powell Sum (Some of different powers)**
+1. **F1: Powell Sum**
    - `f(x) = sum_{i=1}^n |x_i|^(i+1)`
    - Global minimum: f(0,0,...,0) = 0
    - Search domain: [-5.12, 5.12]^n
@@ -57,19 +86,15 @@ This implementation includes the benchmark functions used in the original paper:
    - Global minimum: f(0,0,...,0) = 0
    - Search domain: [-35, 35]^n
 
-Additional benchmark functions are also included for testing purposes.
-
 ## Usage
-
-### Basic Usage
 
 ```python
 from black_widow import BlackWidowOptimizer
 from benchmark_functions import powell_sum
 
-# Define problem dimensions and bounds
+# Define problem
 dimensions = 10
-bounds = [(-5.12, 5.12)] * dimensions  # Same bounds for all dimensions
+bounds = [(-5.12, 5.12)] * dimensions
 
 # Create optimizer
 optimizer = BlackWidowOptimizer(
@@ -81,59 +106,45 @@ optimizer = BlackWidowOptimizer(
     reproduction_rate=0.6,
     cannibalism_rate=0.4,
     mutation_rate=0.4,
-    minimize=True  # Set to False for maximization problems
+    minimize=True
 )
 
 # Run optimization
 best_solution, best_fitness = optimizer.optimize(verbose=True)
-
 print(f"Best solution: {best_solution}")
 print(f"Best fitness: {best_fitness}")
-
-# Access convergence history
-convergence_curve = optimizer.convergence_curve
 ```
 
-### Running the Examples
-
-The repository includes example scripts that demonstrate the algorithm:
+### Running Examples
 
 ```bash
-# Run the main example with benchmark functions from the original paper
+# Run benchmark examples
 python example.py
 
-# Run tests to verify the implementation
+# Run tests
 python test.py
 ```
 
-The example script will run the optimization on the benchmark functions from the original paper and generate a convergence plot.
-
 ## Parameters
 
-The `BlackWidowOptimizer` class accepts the following parameters:
-
-- `objective_function`: The function to optimize
-- `dimensions`: Number of dimensions of the problem
+- `objective_function`: Function to optimize
+- `dimensions`: Problem dimensions
 - `bounds`: List of tuples (min, max) for each dimension
-- `population_size`: Size of the population (default: 40)
-- `max_iterations`: Maximum number of iterations (default: 100)
-- `reproduction_rate`: Percentage of population that will reproduce (default: 0.6)
-- `cannibalism_rate`: Percentage of children that will be destroyed (default: 0.4)
-- `mutation_rate`: Percentage of population that will mutate (default: 0.4)
-- `minimize`: If True, minimize the objective function; otherwise maximize (default: True)
+- `population_size`: Size of population (default: 40)
+- `max_iterations`: Maximum iterations (default: 100)
+- `reproduction_rate`: Percentage of population that reproduces (default: 0.6)
+- `cannibalism_rate`: Percentage of children destroyed (default: 0.4)
+- `mutation_rate`: Percentage of population that mutates (default: 0.4)
+- `minimize`: True for minimization, False for maximization (default: True)
 
 ## Algorithm Steps
 
-1. **Initialization**: Generate a random population of "widows" (solutions)
-2. **Reproduction**: Select the best solutions to procreate and generate children
-3. **Cannibalism**: Destroy some solutions with low fitness
-4. **Mutation**: Randomly mutate some solutions
-5. **Selection**: Create the next generation from the survivors
-6. **Termination**: Return the best solution after reaching the maximum iterations
-
-## Performance
-
-The algorithm has been tested on the benchmark functions from the original paper and shows good convergence properties. The implementation is efficient and can handle high-dimensional optimization problems.
+1. **Initialization**: Generate random population
+2. **Reproduction**: Select best solutions to procreate
+3. **Cannibalism**: Destroy solutions with low fitness
+4. **Mutation**: Randomly mutate solutions
+5. **Selection**: Create next generation from survivors
+6. **Termination**: Return best solution after reaching maximum iterations
 
 ## References
 
