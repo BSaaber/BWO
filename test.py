@@ -1,10 +1,3 @@
-"""
-Simple test script for the Black Widow Optimization Algorithm.
-
-This script runs quick tests on benchmark functions to verify that the
-implementation works correctly.
-"""
-
 import numpy as np
 from black_widow import BlackWidowOptimizer
 from benchmark_functions import sphere, powell_sum
@@ -78,7 +71,7 @@ def main():
         dimensions, 
         bounds_sphere, 
         expected_optimum_sphere,
-        threshold=0.02  # Adjusted threshold to account for randomness in the algorithm
+        threshold=0.02  # Threshold to account for randomness in the algorithm
     )
     
     # Test on Powell Sum function

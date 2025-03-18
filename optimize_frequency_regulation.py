@@ -1,12 +1,3 @@
-"""
-Optimization of PID controller parameters for power system frequency regulation
-using the Black Widow Optimization algorithm.
-
-This script optimizes the parameters of PID controllers for a two-area power system
-to improve frequency stability after load disturbances. It uses a nature-inspired
-optimization algorithm called Black Widow Optimization to find the best controller settings.
-"""
-
 import numpy as np
 import matplotlib.pyplot as plt
 import os

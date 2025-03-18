@@ -1,26 +1,8 @@
-"""
-Black Widow Optimization Algorithm
-
-A meta-heuristic approach for solving optimization problems, inspired by the
-mating behavior of black widow spiders.
-
-Based on the paper:
-"Black Widow Optimization Algorithm: A novel meta-heuristic approach for
-solving engineering optimization problems"
-"""
-
 import numpy as np
 from typing import Callable, Tuple, List, Optional, Union
 
 
 class BlackWidowOptimizer:
-    """
-    Implementation of the Black Widow Optimization Algorithm.
-    
-    This algorithm is inspired by the mating behavior of black widow spiders,
-    where females sometimes eat males after mating (sexual cannibalism).
-    """
-    
     def __init__(
         self,
         objective_function: Callable[[np.ndarray], float],
@@ -34,7 +16,7 @@ class BlackWidowOptimizer:
         minimize: bool = True
     ):
         """
-        Initialize the Black Widow Optimizer.
+        Initialize BWO.
         
         Args:
             objective_function: Function to optimize (fitness function)
@@ -66,6 +48,11 @@ class BlackWidowOptimizer:
         
         # Convergence history
         self.convergence_curve = []
+        
+        # Current population and fitness values
+        self.population = None
+        self.fitness_values = None
+        self.current_iteration = 0
     
     def _validate_parameters(self):
         """Validate the algorithm parameters."""
@@ -81,16 +68,20 @@ class BlackWidowOptimizer:
         if len(self.bounds) != self.dimensions:
             raise ValueError(f"Bounds must be provided for all {self.dimensions} dimensions")
     
-    def _evaluate_fitness(self, widow: np.ndarray) -> float:
+    def _evaluate_fitness(self, widow: Union[np.ndarray, list]) -> float:
         """
         Evaluate the fitness of a widow (solution).
         
         Args:
-            widow: A solution vector
+            widow: A solution vector (numpy array or list)
             
         Returns:
             The fitness value
         """
+        # Convert to numpy array if it's a list
+        if isinstance(widow, list):
+            widow = np.array(widow)
+        
         # Ensure the solution is within bounds
         for i in range(self.dimensions):
             widow[i] = np.clip(widow[i], self.bounds[i][0], self.bounds[i][1])
@@ -280,28 +271,35 @@ class BlackWidowOptimizer:
         
         return mutated_widows
     
-    def _initialize_population(self) -> Tuple[List[np.ndarray], List[float]]:
+    def initialize_population(self) -> None:
+        """
+        Initialize the population and evaluate initial fitness.
+        This method should be called before iterate_once() when using step-by-step execution.
+        """
+        # Generate random population
+        self.population = np.array(self._generate_random_widows())
+        
+        # Evaluate initial population
+        self.fitness_values = [self._evaluate_fitness(widow) for widow in self.population]
+        
+        # Update best solution
+        best_idx = np.argmin(self.fitness_values) if self.minimize else np.argmax(self.fitness_values)
+        self.best_solution = self.population[best_idx].copy()
+        self.best_fitness = self.fitness_values[best_idx]
+        
+        # Reset iteration counter and convergence curve
+        self.current_iteration = 0
+        self.convergence_curve = [self.best_fitness]
+    
+    def _initialize_population(self) -> Tuple[np.ndarray, List[float]]:
         """
         Initialize the population and evaluate initial fitness.
         
         Returns:
             Tuple of (population, fitness_values)
         """
-        # Generate random population
-        population = self._generate_random_widows()
-        
-        # Evaluate initial population
-        fitness_values = [self._evaluate_fitness(widow) for widow in population]
-        
-        # Update best solution
-        best_idx = np.argmin(fitness_values) if self.minimize else np.argmax(fitness_values)
-        self.best_solution = population[best_idx].copy()
-        self.best_fitness = fitness_values[best_idx]
-        
-        # Store initial best fitness in convergence curve
-        self.convergence_curve = [self.best_fitness]
-        
-        return population, fitness_values
+        self.initialize_population()
+        return self.population, self.fitness_values
     
     def _adjust_population_size(self, population: List[np.ndarray]) -> Tuple[List[np.ndarray], List[float]]:
         """
@@ -351,6 +349,35 @@ class BlackWidowOptimizer:
         # Store best fitness in convergence curve
         self.convergence_curve.append(self.best_fitness)
     
+    def iterate_once(self) -> None:
+        """
+        Perform a single iteration of the Black Widow Optimization algorithm.
+        This method should be called after initialize_population() when using step-by-step execution.
+        """
+        if self.population is None or self.fitness_values is None:
+            raise ValueError("Population not initialized. Call initialize_population() first.")
+        
+        # Reproduction and cannibalism
+        widows_after_reproduction = self._perform_reproduction(self.population.tolist(), self.fitness_values)
+        
+        # Mutation
+        mutated_widows = self._perform_mutation(self.population.tolist())
+        
+        # Create next generation
+        next_generation = mutated_widows + widows_after_reproduction
+        
+        # Adjust population size and get updated fitness values
+        self.population, self.fitness_values = self._adjust_population_size(next_generation)
+        
+        # Convert population to numpy array for easier indexing in GUI
+        self.population = np.array(self.population)
+        
+        # Update best solution
+        self._update_best_solution(self.population.tolist(), self.fitness_values)
+        
+        # Increment iteration counter
+        self.current_iteration += 1
+    
     def optimize(self, verbose: bool = False) -> Tuple[np.ndarray, float]:
         """
         Run the Black Widow Optimization algorithm.
@@ -362,28 +389,15 @@ class BlackWidowOptimizer:
             Tuple of (best solution, best fitness)
         """
         # Initialize population
-        current_widows, fitness_values = self._initialize_population()
+        self.initialize_population()
         
         # Main loop
-        for iteration in range(self.max_iterations):
-            # Reproduction and cannibalism
-            widows_after_reproduction = self._perform_reproduction(current_widows, fitness_values)
-            
-            # Mutation
-            mutated_widows = self._perform_mutation(current_widows)
-            
-            # Create next generation
-            next_generation = mutated_widows + widows_after_reproduction
-            
-            # Adjust population size and get updated fitness values
-            current_widows, fitness_values = self._adjust_population_size(next_generation)
-            
-            # Update best solution
-            self._update_best_solution(current_widows, fitness_values)
+        for _ in range(self.max_iterations):
+            self.iterate_once()
             
             # Print progress if verbose
-            if verbose and (iteration + 1) % 10 == 0:
-                print(f"Iteration {iteration + 1}/{self.max_iterations}, Best fitness: {self.best_fitness}")
+            if verbose and self.current_iteration % 10 == 0:
+                print(f"Iteration {self.current_iteration}/{self.max_iterations}, Best fitness: {self.best_fitness}")
         
         if verbose:
             print(f"Optimization completed. Best fitness: {self.best_fitness}")

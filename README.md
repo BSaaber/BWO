@@ -14,12 +14,15 @@ The Black Widow Optimization Algorithm is a population-based meta-heuristic algo
 - `test.py`: Test script
 - `frequency_regulation_function.py`: Power system frequency regulation functions
 - `optimize_frequency_regulation.py`: Application to power system frequency regulation
+- `black_widow_gui.py`: GUI implementation for algorithm visualization
+- `run_gui.py`: Script to launch the GUI
 
 ## Requirements
 
 - Python 3.6+
 - NumPy
 - Matplotlib
+- Tkinter (for GUI)
 
 ## Power System Frequency Regulation Application
 
@@ -123,6 +126,9 @@ python example.py
 
 # Run tests
 python test.py
+
+# Run the GUI
+python run_gui.py
 ```
 
 ## Parameters
@@ -137,6 +143,36 @@ python test.py
 - `mutation_rate`: Percentage of population that mutates (default: 0.4)
 - `minimize`: True for minimization, False for maximization (default: True)
 
+## Graphical User Interface (GUI)
+
+The project includes a GUI that allows users to visualize the optimization process and interact with the algorithm in real-time.
+
+### GUI Features
+
+- Interactive 2D visualization of optimization functions
+- Step-by-step execution of the optimization algorithm
+- Visualization of agent positions and movements
+- Real-time tracking of the best solution
+- Parameter adjustment panel
+- Variable selection through sliders and checkboxes
+
+### Running the GUI
+
+```bash
+python run_gui.py
+```
+
+### Using the GUI
+
+1. Select a function from the dropdown menu
+2. Set the number of dimensions and algorithm parameters
+3. Select which 2 dimensions to visualize using the checkboxes
+4. Adjust non-visualized dimensions using sliders
+5. Click "Start" to initialize the optimization
+6. Click "Step" to perform one iteration at a time
+7. Toggle "Show Trails" in the View menu to see agent movement paths
+8. Use "Save Plot" in the File menu to save the current visualization
+
 ## Algorithm Steps
 
 1. **Initialization**: Generate random population
@@ -149,3 +185,4 @@ python test.py
 ## References
 
 - Hayyolalam, V., & Pourhaji Kazem, A. A. (2020). Black Widow Optimization Algorithm: A novel meta-heuristic approach for solving engineering optimization problems. Engineering Applications of Artificial Intelligence, 87, 103249.
+- Preeti Dahiya, Akshay Kumar Saha (2021). Frequency Regulation of Interconnected Power System Using Black Widow Optimization.

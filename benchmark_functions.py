@@ -1,10 +1,3 @@
-"""
-Benchmark Functions for Optimization Algorithms
-
-This module contains standard benchmark functions used to test optimization algorithms,
-including the specific functions tested in the original Black Widow Optimization paper.
-"""
-
 import numpy as np
 
 
